@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: leave-request-database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: leave_request
+    ports:
+      - "5432:5432"
