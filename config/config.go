@@ -15,6 +15,11 @@ type Config struct {
 	Server     serverConfig
 	Database   databaseConfig
 	SuperAdmin superAdminConfig
+	JWT        jwtConfig
+}
+
+type jwtConfig struct {
+	Secret string
 }
 
 type superAdminConfig struct {

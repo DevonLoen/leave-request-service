@@ -19,7 +19,7 @@ type User struct {
 	userRepo *repositories.User
 }
 
-func NewUserService(userRepo *repositories.User) *User {
+func NewUserUsecase(userRepo *repositories.User) *User {
 	return &User{userRepo: userRepo}
 }
 

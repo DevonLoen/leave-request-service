@@ -8,6 +8,7 @@ import (
 	"github.com/devonLoen/leave-request-service/config"
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/database"
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/handler"
+	"github.com/devonLoen/leave-request-service/internal/app/rest_api/pkg/util"
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/repository"
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/usecase"
 	"github.com/gin-gonic/gin"
@@ -40,18 +41,24 @@ func main() {
 		}
 	}()
 
+	util.SetupJWT(config.JWT.Secret)
+
 	userRepo := repository.NewUserRepository(client.DB)
 
-	userUsecase := usecase.NewUserService(userRepo)
+	userUsecase := usecase.NewUserUsecase(userRepo)
 
 	userHandler := handler.NewUserHandler(userUsecase)
+
+	authUsecase := usecase.NewAuthUsecase(userRepo)
+
+	authHandler := handler.NewAuthHandler(authUsecase)
 
 	cors := config.CorsNew()
 
 	router := gin.Default()
 	router.Use(cors)
 
-	routes.RegisterPublicEndpoints(router, userHandler)
+	routes.RegisterPublicEndpoints(router, userHandler, authHandler)
 
 	server := serve.NewServer(log.Logger, router, config)
 	server.Serve()

@@ -23,6 +23,10 @@ func mapUser(rows *sql.Row, u *entities.User) error {
 	return rows.Scan(&u.ID, &u.FullName, &u.Email, &u.Role)
 }
 
+func mapUserWithPassword(rows *sql.Row, u *entities.User) error {
+	return rows.Scan(&u.ID, &u.FullName, &u.Email, &u.Role, &u.Password)
+}
+
 func mapUsers(rows *sql.Rows, u *entities.User) error {
 	return rows.Scan(&u.ID, &u.FullName, &u.Email, &u.Role)
 }
@@ -31,6 +35,14 @@ func (r *User) FindByEmail(email string) (*entities.User, error) {
 	return r.SelectSingle(
 		mapUser,
 		"SELECT u.id, u.full_name, u.email, u.role FROM users u WHERE u.email = $1",
+		email,
+	)
+}
+
+func (r *User) FindByEmailWithPassword(email string) (*entities.User, error) {
+	return r.SelectSingle(
+		mapUserWithPassword,
+		"SELECT u.id, u.full_name, u.email, u.role, u.password FROM users u WHERE u.email = $1",
 		email,
 	)
 }
