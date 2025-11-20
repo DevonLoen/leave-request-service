@@ -1,0 +1,29 @@
+{
+    "name": "Go Dev Container (1.25.4)",
+    "image": "golang:1.25.4",
+    "features": {
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+    "runArgs": [
+        "--add-host=host.docker.internal:host-gateway"
+    ],
+    "forwardPorts": [
+        8080
+    ],
+    "postCreateCommand": "go install github.com/air-verse/air@latest && go install golang.org/x/tools/gopls@latest && go install golang.org/x/tools/cmd/goimports@latest",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "go.formatTool": "goimports",
+                "go.useLanguageServer": true,
+                "go.goroot": "/usr/local/go",
+                "editor.formatOnSave": true
+            },
+            "extensions": [
+                "golang.go",
+                "ms-vscode.live-server",
+                "yzhang.dictionary-completion"
+            ]
+        }
+    }
+}
