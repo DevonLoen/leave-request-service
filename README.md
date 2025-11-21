@@ -65,7 +65,7 @@ make run
 This command runs the server using `air` for automatic hot reloading upon source code changes.
 
 ```bash
-make run dev
+make run.dev
 ```
 
 ### c. How to Run Migrations

@@ -38,6 +38,6 @@ seed:
 run:
 	go run cmd/rest_api/main.go
 
-.PHONY: run dev
-run dev:
+.PHONY: run.dev
+run.dev:
 	air
