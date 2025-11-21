@@ -16,10 +16,10 @@ import (
 )
 
 type LeaveRequest struct {
-	leaveRequestUsecase *usecase.LeaveRequest
+	leaveRequestUsecase usecase.LeaveRequestUsecase
 }
 
-func NewLeaveRequestHandler(leaveRequestUsecase *usecase.LeaveRequest) *LeaveRequest {
+func NewLeaveRequestHandler(leaveRequestUsecase usecase.LeaveRequestUsecase) *LeaveRequest {
 	return &LeaveRequest{leaveRequestUsecase: leaveRequestUsecase}
 }
 

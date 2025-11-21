@@ -13,11 +13,23 @@ import (
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/repository"
 )
 
-type LeaveRequest struct {
-	leaveRequestRepo *repository.LeaveRequest
+type LeaveRequestUsecase interface {
+	CreateLeaveRequest(*dto.CreateLeaveRequestRequest, int) (*dto.CreateLeaveRequestResponse, *models.ErrorResponse)
+
+	GetAllLeaveRequests(limit, offset int, sortBy, orderBy, search string, filter entity.LeaveRequestFilter) (*dto.GetAllLeaveRequestsResponse, *models.ErrorResponse)
+
+	GetLeaveRequest(leaveRequestID int) (*dto.LeaveRequestResponse, *models.ErrorResponse)
+
+	Approve(leaveRequestID int) *models.ErrorResponse
+
+	Reject(leaveRequestID int) *models.ErrorResponse
 }
 
-func NewLeaveRequestUsecase(leaveRequestRepo *repository.LeaveRequest) *LeaveRequest {
+type LeaveRequest struct {
+	leaveRequestRepo repository.LeaveRequestRepository
+}
+
+func NewLeaveRequestUsecase(leaveRequestRepo repository.LeaveRequestRepository) *LeaveRequest {
 	return &LeaveRequest{leaveRequestRepo: leaveRequestRepo}
 }
 
