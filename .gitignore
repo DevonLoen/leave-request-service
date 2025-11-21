@@ -46,3 +46,4 @@ dev.env
 
 # Test cache
 /coverage.out
+/coverage.html
