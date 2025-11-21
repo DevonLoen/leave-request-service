@@ -7,23 +7,22 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/devonLoen/leave-request-service/internal/app/rest_api/entity"
-	entities "github.com/devonLoen/leave-request-service/internal/app/rest_api/entity"
+	entity "github.com/devonLoen/leave-request-service/internal/app/rest_api/entity"
 	models "github.com/devonLoen/leave-request-service/internal/app/rest_api/model"
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/model/dto"
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/pkg/util"
-	repositories "github.com/devonLoen/leave-request-service/internal/app/rest_api/repository"
+	repository "github.com/devonLoen/leave-request-service/internal/app/rest_api/repository"
 )
 
 type User struct {
-	userRepo *repositories.User
+	userRepo *repository.User
 }
 
-func NewUserUsecase(userRepo *repositories.User) *User {
+func NewUserUsecase(userRepo *repository.User) *User {
 	return &User{userRepo: userRepo}
 }
 
-func (us *User) GetAllUsers(limit, offset int, sortBy, orderBy, search string, filter entities.UserFilter) (*dto.GetAllUsersResponse, *models.ErrorResponse) {
+func (us *User) GetAllUsers(limit, offset int, sortBy, orderBy, search string, filter entity.UserFilter) (*dto.GetAllUsersResponse, *models.ErrorResponse) {
 	response := &dto.GetAllUsersResponse{}
 
 	allowedSorts := map[string]bool{
