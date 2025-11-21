@@ -10,7 +10,17 @@ import (
 	entity "github.com/devonLoen/leave-request-service/internal/app/rest_api/entity"
 )
 
+type LeaveRequestRepository interface {
+	Create(leaveRequest *entity.LeaveRequest) error
+	FindById(id int) (*entity.LeaveRequest, error)
+	GetAllLeaveRequests(limit, offset int, sortBy, orderBy, search string, filter entity.LeaveRequestFilter) ([]*entity.LeaveRequest, error)
+	Approve(leaveRequestId int) error
+	Reject(leaveRequestId int) error
+	OverlapApprovedLeaveExists(userId int, startDate, endDate time.Time) (bool, error)
+}
+
 type LeaveRequest struct {
+	DB *sql.DB
 	database.BaseSQLRepository[entity.LeaveRequest]
 }
 
