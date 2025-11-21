@@ -5,7 +5,7 @@ import (
 	"log"
 
 	config "github.com/devonLoen/leave-request-service/config"
-	entities "github.com/devonLoen/leave-request-service/internal/app/rest_api/entity"
+	entity "github.com/devonLoen/leave-request-service/internal/app/rest_api/entity"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -24,7 +24,7 @@ func SeedSuperAdmin(db *sql.DB) {
 		log.Fatal("Failed to hash password:", err)
 	}
 
-	user := entities.User{
+	user := entity.User{
 		FullName: "Super Admin",
 		Email:    email,
 		Password: string(hashedPassword),

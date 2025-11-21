@@ -8,14 +8,14 @@ import (
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/model"
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/model/dto"
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/pkg/util"
-	repositories "github.com/devonLoen/leave-request-service/internal/app/rest_api/repository"
+	repository "github.com/devonLoen/leave-request-service/internal/app/rest_api/repository"
 )
 
 type Auth struct {
-	userRepo *repositories.User
+	userRepo *repository.User
 }
 
-func NewAuthUsecase(userRepo *repositories.User) *Auth {
+func NewAuthUsecase(userRepo *repository.User) *Auth {
 	return &Auth{userRepo: userRepo}
 }
 

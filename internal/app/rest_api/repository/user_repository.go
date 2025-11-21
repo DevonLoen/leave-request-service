@@ -6,32 +6,32 @@ import (
 	"strings"
 
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/database"
-	entities "github.com/devonLoen/leave-request-service/internal/app/rest_api/entity"
+	entity "github.com/devonLoen/leave-request-service/internal/app/rest_api/entity"
 )
 
 type User struct {
-	database.BaseSQLRepository[entities.User]
+	database.BaseSQLRepository[entity.User]
 }
 
 func NewUserRepository(db *sql.DB) *User {
 	return &User{
-		BaseSQLRepository: database.BaseSQLRepository[entities.User]{DB: db},
+		BaseSQLRepository: database.BaseSQLRepository[entity.User]{DB: db},
 	}
 }
 
-func mapUser(rows *sql.Row, u *entities.User) error {
+func mapUser(rows *sql.Row, u *entity.User) error {
 	return rows.Scan(&u.ID, &u.FullName, &u.Email, &u.Role)
 }
 
-func mapUserWithPassword(rows *sql.Row, u *entities.User) error {
+func mapUserWithPassword(rows *sql.Row, u *entity.User) error {
 	return rows.Scan(&u.ID, &u.FullName, &u.Email, &u.Role, &u.Password)
 }
 
-func mapUsers(rows *sql.Rows, u *entities.User) error {
+func mapUsers(rows *sql.Rows, u *entity.User) error {
 	return rows.Scan(&u.ID, &u.FullName, &u.Email, &u.Role)
 }
 
-func (r *User) FindByEmail(email string) (*entities.User, error) {
+func (r *User) FindByEmail(email string) (*entity.User, error) {
 	return r.SelectSingle(
 		mapUser,
 		"SELECT u.id, u.full_name, u.email, u.role FROM users u WHERE u.email = $1",
@@ -39,7 +39,7 @@ func (r *User) FindByEmail(email string) (*entities.User, error) {
 	)
 }
 
-func (r *User) FindByEmailWithPassword(email string) (*entities.User, error) {
+func (r *User) FindByEmailWithPassword(email string) (*entity.User, error) {
 	return r.SelectSingle(
 		mapUserWithPassword,
 		"SELECT u.id, u.full_name, u.email, u.role, u.password FROM users u WHERE u.email = $1",
@@ -47,7 +47,7 @@ func (r *User) FindByEmailWithPassword(email string) (*entities.User, error) {
 	)
 }
 
-func (r *User) FindById(id int) (*entities.User, error) {
+func (r *User) FindById(id int) (*entity.User, error) {
 	return r.SelectSingle(
 		mapUser,
 		"SELECT u.id, u.full_name, u.email, u.role FROM users u WHERE u.id = $1",
@@ -55,23 +55,7 @@ func (r *User) FindById(id int) (*entities.User, error) {
 	)
 }
 
-// func (r *User) GetAllUsers(limit, offset int, sortBy, orderBy string) ([]*entities.User, error) {
-
-// 	query := fmt.Sprintf(
-// 		"SELECT u.id, u.fullname, u.email, FROM users u ORDER BY u.%s %s LIMIT $1 OFFSET $2",
-// 		sortBy,
-// 		orderBy,
-// 	)
-
-// 	return r.SelectMultiple(
-// 		mapUsers,
-// 		query,
-// 		limit,
-// 		offset,
-// 	)
-// }
-
-func (r *User) GetAllUsers(limit, offset int, sortBy, orderBy, search string, filter entities.UserFilter) ([]*entities.User, error) {
+func (r *User) GetAllUsers(limit, offset int, sortBy, orderBy, search string, filter entity.UserFilter) ([]*entity.User, error) {
 	baseQuery := "SELECT u.id, u.full_name, u.email, u.role FROM users u"
 	var conditions []string
 	var args []interface{}
@@ -108,7 +92,7 @@ func (r *User) GetAllUsers(limit, offset int, sortBy, orderBy, search string, fi
 	)
 }
 
-func (r *User) Create(user *entities.User) error {
+func (r *User) Create(user *entity.User) error {
 	_, err := r.Insert(
 		"INSERT INTO users (full_name, email, password, role) VALUES ($1, $2, $3, $4)",
 		user.FullName, user.Email, user.Password, user.Role,

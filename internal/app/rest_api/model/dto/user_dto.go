@@ -1,6 +1,6 @@
 package dto
 
-import entities "github.com/devonLoen/leave-request-service/internal/app/rest_api/entity"
+import entity "github.com/devonLoen/leave-request-service/internal/app/rest_api/entity"
 
 type UserResponse struct {
 	FullName string `json:"fullName"`
@@ -25,7 +25,7 @@ type CreateUserResponse struct {
 	Message  string `json:"message" binding:"required"`
 }
 
-func (r *GetAllUsersResponse) MapUsersResponse(users []*entities.User) {
+func (r *GetAllUsersResponse) MapUsersResponse(users []*entity.User) {
 	for _, users := range users {
 		user := &UserResponse{
 			FullName: users.FullName,
@@ -36,21 +36,21 @@ func (r *GetAllUsersResponse) MapUsersResponse(users []*entities.User) {
 	}
 }
 
-func (r *UserResponse) MapUserResponse(user *entities.User) {
+func (r *UserResponse) MapUserResponse(user *entity.User) {
 	r.FullName = user.FullName
 	r.Email = user.Email
 	r.Role = string(user.Role)
 }
 
-func (ur *CreateUserRequest) ToUser() *entities.User {
-	return &entities.User{
+func (ur *CreateUserRequest) ToUser() *entity.User {
+	return &entity.User{
 		FullName: ur.FullName,
 		Email:    ur.Email,
-		Role:     entities.UserRole(ur.Role),
+		Role:     entity.UserRole(ur.Role),
 	}
 }
 
-func (ur *CreateUserResponse) FromUser(user *entities.User) *CreateUserResponse {
+func (ur *CreateUserResponse) FromUser(user *entity.User) *CreateUserResponse {
 	return &CreateUserResponse{
 		FullName: user.FullName,
 		Email:    user.Email,

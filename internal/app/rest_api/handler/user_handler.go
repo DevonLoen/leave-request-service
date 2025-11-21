@@ -84,7 +84,12 @@ func (h *User) GetUser(ctx *gin.Context) {
 func (h *User) CreateUser(ctx *gin.Context) {
 	var createUserRequest dto.CreateUserRequest
 
-	if err := ctx.ShouldBindJSON(&createUserRequest); err != nil {
+	if err := util.StrictBindJSON(ctx, &createUserRequest); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := validator.New().Struct(createUserRequest); err != nil {
 		var ve validator.ValidationErrors
 		if errors.As(err, &ve) {
 			out := make(map[string]string)
@@ -92,11 +97,9 @@ func (h *User) CreateUser(ctx *gin.Context) {
 				out[fe.Field()] = util.MsgForTag(fe)
 			}
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": out})
-
 			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-
 		return
 	}
 

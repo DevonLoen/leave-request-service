@@ -55,6 +55,9 @@ func NewConfig() *Config {
 			Email:    GetEnvOrPanic(constants.EnvKeys.SuperAdminEmail),
 			Password: GetEnvOrPanic(constants.EnvKeys.SuperAdminPassword),
 		},
+		JWT: jwtConfig{
+			Secret: GetEnvOrPanic(constants.EnvKeys.JwtSecret),
+		},
 	}
 
 	return c

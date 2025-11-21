@@ -53,12 +53,18 @@ func main() {
 
 	authHandler := handler.NewAuthHandler(authUsecase)
 
+	leaveRequestRepo := repository.NewLeaveRequestRepository(client.DB)
+
+	leaveRequestUsecase := usecase.NewLeaveRequestUsecase(leaveRequestRepo)
+
+	leaveRequestHandler := handler.NewLeaveRequestHandler(leaveRequestUsecase)
+
 	cors := config.CorsNew()
 
 	router := gin.Default()
 	router.Use(cors)
 
-	routes.RegisterPublicEndpoints(router, userHandler, authHandler)
+	routes.RegisterPublicEndpoints(router, userHandler, authHandler, leaveRequestHandler)
 
 	server := serve.NewServer(log.Logger, router, config)
 	server.Serve()
