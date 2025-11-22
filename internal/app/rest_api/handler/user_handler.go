@@ -2,23 +2,23 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/entity"
 	dto "github.com/devonLoen/leave-request-service/internal/app/rest_api/model/dto"
+	"github.com/devonLoen/leave-request-service/internal/app/rest_api/pkg/util"
 	"github.com/devonLoen/leave-request-service/internal/app/rest_api/usecase"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
 type User struct {
-	userService *usecase.User
+	userUsecase *usecase.User
 }
 
-func NewUserHandler(userService *usecase.User) *User {
-	return &User{userService: userService}
+func NewUserHandler(userUsecase *usecase.User) *User {
+	return &User{userUsecase: userUsecase}
 }
 
 func (h *User) GetAllUsers(ctx *gin.Context) {
@@ -52,7 +52,7 @@ func (h *User) GetAllUsers(ctx *gin.Context) {
 	}
 	offset := (page - 1) * limit
 
-	allUsers, err := h.userService.GetAllUsers(limit, offset, sortByStr, orderByStr, search, filter)
+	allUsers, err := h.userUsecase.GetAllUsers(limit, offset, sortByStr, orderByStr, search, filter)
 	if err != nil {
 		ctx.AbortWithStatusJSON(err.Code, err)
 
@@ -71,7 +71,7 @@ func (h *User) GetUser(ctx *gin.Context) {
 		return
 	}
 
-	user, userErr := h.userService.GetUser(userID)
+	user, userErr := h.userUsecase.GetUser(userID)
 	if userErr != nil {
 		ctx.AbortWithStatusJSON(userErr.Code, userErr)
 
@@ -84,23 +84,26 @@ func (h *User) GetUser(ctx *gin.Context) {
 func (h *User) CreateUser(ctx *gin.Context) {
 	var createUserRequest dto.CreateUserRequest
 
-	if err := ctx.ShouldBindJSON(&createUserRequest); err != nil {
+	if err := util.StrictBindJSON(ctx, &createUserRequest); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := validator.New().Struct(createUserRequest); err != nil {
 		var ve validator.ValidationErrors
 		if errors.As(err, &ve) {
 			out := make(map[string]string)
 			for _, fe := range ve {
-				out[fe.Field()] = msgForTag(fe)
+				out[fe.Field()] = util.MsgForTag(fe)
 			}
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": out})
-
 			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-
 		return
 	}
 
-	createUserResponse, signupError := h.userService.CreateUser(&createUserRequest)
+	createUserResponse, signupError := h.userUsecase.CreateUser(&createUserRequest)
 	if signupError != nil {
 		ctx.AbortWithStatusJSON(signupError.Code, signupError)
 
@@ -108,17 +111,4 @@ func (h *User) CreateUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, createUserResponse)
-}
-
-func msgForTag(fe validator.FieldError) string {
-	switch fe.Tag() {
-	case "required":
-		return "This field is required"
-	case "min":
-		return fmt.Sprintf("Minimum length is %s", fe.Param())
-	case "custom_password":
-		return "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
-	default:
-		return "Invalid value"
-	}
 }

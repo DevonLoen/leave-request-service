@@ -39,9 +39,11 @@ Thumbs.db
 # Env files
 .env
 .env.*.local
+dev.env
 
 # Dependency tools
 /vendor/
 
 # Test cache
 /coverage.out
+/coverage.html

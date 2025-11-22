@@ -15,6 +15,11 @@ type Config struct {
 	Server     serverConfig
 	Database   databaseConfig
 	SuperAdmin superAdminConfig
+	JWT        jwtConfig
+}
+
+type jwtConfig struct {
+	Secret string
 }
 
 type superAdminConfig struct {
@@ -49,6 +54,9 @@ func NewConfig() *Config {
 		SuperAdmin: superAdminConfig{
 			Email:    GetEnvOrPanic(constants.EnvKeys.SuperAdminEmail),
 			Password: GetEnvOrPanic(constants.EnvKeys.SuperAdminPassword),
+		},
+		JWT: jwtConfig{
+			Secret: GetEnvOrPanic(constants.EnvKeys.JwtSecret),
 		},
 	}
 

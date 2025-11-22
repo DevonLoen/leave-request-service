@@ -22,12 +22,12 @@ func (r UserRole) IsValid() bool {
 
 type User struct {
 	ID        int       `json:"id" db:"id"`
-	FullName  string    `json:"full_name" db:"full_name"`
+	FullName  string    `json:"fullName" db:"full_name"`
 	Email     string    `json:"email" db:"email"`
 	Role      UserRole  `json:"role" db:"role"`
 	Password  string    `json:"-" db:"password"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	CreatedAt time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt time.Time `json:"updatedAt" db:"updated_at"`
 }
 
 type UserFilter struct {

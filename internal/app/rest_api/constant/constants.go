@@ -10,6 +10,7 @@ var EnvKeys = envKeys{
 	DBSource:           "DB_SOURCE",
 	SuperAdminEmail:    "SUPER_ADMIN_EMAIL",
 	SuperAdminPassword: "SUPER_ADMIN_PASSWORD",
+	JwtSecret:          "JWT_SECRET",
 }
 
 var Headers = headers{
@@ -27,6 +28,7 @@ type envKeys struct {
 	DBSource           string
 	SuperAdminEmail    string
 	SuperAdminPassword string
+	JwtSecret          string
 }
 
 type headers struct {
