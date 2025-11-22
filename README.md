@@ -226,3 +226,18 @@ The application logic must enforce the following rules during leave request subm
   * **Overlap Validation (Approved Status):**
       * For the same employee, there **must not** be any two leave requests with an `APPROVED` status whose timeframes overlap.
       * *Example:* If a user has an approved leave from 2025-12-01 08:00 to 2025-12-03 17:00, no other request for that user can be approved for a period that falls within those dates/times.
+  
+## 🔗 API Documentation & Postman Collection
+
+All endpoints within this service (including authentication, user management, and leave requests) can be easily tested using the provided Postman Collection.
+
+### ⬇️ Postman Collection Link
+
+You can import this Collection directly into Postman to begin testing:
+
+> [[Postman Collection Link](https://dark-firefly-6451.postman.co/workspace/1beae329-aa58-46f4-8946-0d02fad55507/collection/31062578-74f67b61-d117-4bf6-b048-ab0d240f0c5b?action=share&source=copy-link&creator=31062578)]
+
+### ⚙️ Testing Authentication Guide
+
+* **Token Management:** The **Tests** script on the `/login` request automatically saves the received JWT token to the **`{{authToken}}`** Global/Environment variable.
+* **Authorization:** All subsequent API requests that require authorization are configured to use the **Authorization Type: Bearer Token** with the variable value **`{{authToken}}`**.

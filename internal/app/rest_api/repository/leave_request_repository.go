@@ -47,7 +47,7 @@ func (r *LeaveRequest) FindById(id int) (*entity.LeaveRequest, error) {
 }
 
 func (r *LeaveRequest) GetAllLeaveRequests(limit, offset int, sortBy, orderBy, search string, filter entity.LeaveRequestFilter) ([]*entity.LeaveRequest, error) {
-	baseQuery := "SELECT lr.id, lr.start_date, lr.end_date, lr.type, lr.status, lr.reason FROM leave_requests lr"
+	baseQuery := "SELECT lr.id, lr.user_id, lr.start_date, lr.end_date, lr.type, lr.status, lr.reason FROM leave_requests lr"
 	var conditions []string
 	var args []interface{}
 
@@ -80,6 +80,7 @@ func (r *LeaveRequest) GetAllLeaveRequests(limit, offset int, sortBy, orderBy, s
 
 	baseQuery += fmt.Sprintf(" ORDER BY lr.%s %s LIMIT $%d OFFSET $%d", sortBy, orderBy, argId, argId+1)
 	args = append(args, limit, offset)
+	fmt.Println(("here2?"))
 
 	return r.SelectMultiple(
 		mapLeaveRequests,
