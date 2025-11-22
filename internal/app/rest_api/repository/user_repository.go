@@ -82,7 +82,6 @@ func (r *User) GetAllUsers(limit, offset int, sortBy, orderBy, search string, fi
 	}
 
 	baseQuery += fmt.Sprintf(" ORDER BY u.%s %s LIMIT $%d OFFSET $%d", sortBy, orderBy, argId, argId+1)
-	fmt.Println((baseQuery))
 	args = append(args, limit, offset)
 
 	return r.SelectMultiple(

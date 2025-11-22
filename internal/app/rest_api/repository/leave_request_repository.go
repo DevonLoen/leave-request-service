@@ -35,7 +35,7 @@ func mapLeaveRequest(rows *sql.Row, lr *entity.LeaveRequest) error {
 }
 
 func mapLeaveRequests(rows *sql.Rows, lr *entity.LeaveRequest) error {
-	return rows.Scan(&lr.ID, &lr.StartDate, &lr.EndDate, &lr.Type, &lr.Status, &lr.Reason)
+	return rows.Scan(&lr.ID, &lr.UserId, &lr.StartDate, &lr.EndDate, &lr.Type, &lr.Status, &lr.Reason)
 }
 
 func (r *LeaveRequest) FindById(id int) (*entity.LeaveRequest, error) {
@@ -79,7 +79,6 @@ func (r *LeaveRequest) GetAllLeaveRequests(limit, offset int, sortBy, orderBy, s
 	}
 
 	baseQuery += fmt.Sprintf(" ORDER BY lr.%s %s LIMIT $%d OFFSET $%d", sortBy, orderBy, argId, argId+1)
-	fmt.Println((baseQuery))
 	args = append(args, limit, offset)
 
 	return r.SelectMultiple(
@@ -114,22 +113,25 @@ func (r *LeaveRequest) Reject(leaveRequestId int) error {
 }
 
 func (r *LeaveRequest) OverlapApprovedLeaveExists(userId int, startDate, endDate time.Time) (bool, error) {
-	var exists bool
+	query := `SELECT lr.id, lr.user_id, lr.start_date, lr.end_date, lr.type, lr.status, lr.reason 
+              FROM leave_requests lr 
+              WHERE lr.user_id = $1 
+              AND lr.status = 'approved' 
+              AND NOT (lr.end_date < $2 OR lr.start_date > $3)`
 
-	query := `
-        SELECT EXISTS (
-            SELECT 1 
-            FROM leave_requests lr
-            WHERE lr.user_id = $1 
-            AND lr.status = 'approved' 
-            AND NOT (lr.end_date < $2 OR lr.start_date > $3)
-        )`
+	rows, err := r.SelectMultiple(
+		mapLeaveRequests,
+		query,
+		userId, startDate, endDate,
+	)
 
-	row := r.DB.QueryRow(query, userId, startDate, endDate)
-
-	if err := row.Scan(&exists); err != nil {
+	if err != nil {
 		return false, err
 	}
 
-	return exists, nil
+	if len(rows) > 0 {
+		return true, nil
+	}
+
+	return false, nil
 }

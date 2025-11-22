@@ -114,7 +114,6 @@ func (us *LeaveRequest) GetLeaveRequest(leaveRequestID int) (*dto.LeaveRequestRe
 
 func (us *LeaveRequest) CreateLeaveRequest(createLeaveRequestRequest *dto.CreateLeaveRequestRequest, userId int) (*dto.CreateLeaveRequestResponse, *models.ErrorResponse) {
 	leaveRequestResponse := &dto.CreateLeaveRequestResponse{}
-
 	errCheckExist := us.OverlapApprovedLeaveExists(userId, createLeaveRequestRequest.StartDate, createLeaveRequestRequest.EndDate)
 	if errCheckExist != nil {
 		return nil, errCheckExist

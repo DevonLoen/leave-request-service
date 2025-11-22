@@ -1,14 +1,21 @@
 package repository
 
 import (
+	"database/sql/driver"
 	"errors"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/devonLoen/leave-request-service/internal/app/rest_api/database"
+	entity "github.com/devonLoen/leave-request-service/internal/app/rest_api/entity"
 )
 
 var ErrSimulatedDB = errors.New("simulated DB error")
+
+var leaveRequestColumns = []string{
+	"id", "user_id", "start_date", "end_date", "type", "status", "reason",
+}
 
 func setupMockDB(t *testing.T) (*LeaveRequest, sqlmock.Sqlmock) {
 	db, mock, err := sqlmock.New()
@@ -16,7 +23,13 @@ func setupMockDB(t *testing.T) (*LeaveRequest, sqlmock.Sqlmock) {
 		t.Fatalf("Error creating mock database: %v", err)
 	}
 
-	repo := &LeaveRequest{DB: db}
+	repo := &LeaveRequest{
+		DB: db,
+
+		BaseSQLRepository: database.BaseSQLRepository[entity.LeaveRequest]{
+			DB: db,
+		},
+	}
 	return repo, mock
 }
 
@@ -26,6 +39,13 @@ func TestOverlapApprovedLeaveExists(t *testing.T) {
 	startDate := time.Date(2025, time.February, 1, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(2025, time.February, 10, 0, 0, 0, 0, time.UTC)
 
+	var overlappingRow = []driver.Value{
+		1, userID,
+		time.Date(2025, time.February, 5, 0, 0, 0, 0, time.UTC),
+		time.Date(2025, time.February, 15, 0, 0, 0, 0, time.UTC),
+		"ANNUAL", "approved", "Holiday",
+	}
+
 	tests := []struct {
 		name          string
 		expectedExist bool
@@ -33,23 +53,26 @@ func TestOverlapApprovedLeaveExists(t *testing.T) {
 		expectedError error
 	}{
 		{
-			name:          "Case 1: Overlap Found",
+			name:          "Case 1: Overlap Found (Returns 1 Row)",
 			expectedExist: true,
 			expectedError: nil,
 			mockExpect: func(mock sqlmock.Sqlmock, userID int, start, end time.Time) {
-				mock.ExpectQuery(`SELECT EXISTS`).
+				mock.ExpectQuery(`SELECT lr.id`).
 					WithArgs(userID, start, end).
-					WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(true))
+					WillReturnRows(
+						sqlmock.NewRows(leaveRequestColumns).
+							AddRow(overlappingRow...),
+					)
 			},
 		},
 		{
-			name:          "Case 2: No Overlap Found",
+			name:          "Case 2: No Overlap Found (Returns 0 Rows)",
 			expectedExist: false,
 			expectedError: nil,
 			mockExpect: func(mock sqlmock.Sqlmock, userID int, start, end time.Time) {
-				mock.ExpectQuery(`SELECT EXISTS`).
+				mock.ExpectQuery(`SELECT lr.id`).
 					WithArgs(userID, start, end).
-					WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
+					WillReturnRows(sqlmock.NewRows(leaveRequestColumns))
 			},
 		},
 		{
@@ -57,7 +80,7 @@ func TestOverlapApprovedLeaveExists(t *testing.T) {
 			expectedExist: false,
 			expectedError: ErrSimulatedDB,
 			mockExpect: func(mock sqlmock.Sqlmock, userID int, start, end time.Time) {
-				mock.ExpectQuery(`SELECT EXISTS`).
+				mock.ExpectQuery(`SELECT lr.id`).
 					WithArgs(userID, start, end).
 					WillReturnError(ErrSimulatedDB)
 			},

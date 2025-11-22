@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -72,8 +71,6 @@ func (h *LeaveRequest) GetMyLeaveRequests(ctx *gin.Context) {
 	orderByStr := ctx.DefaultQuery("orderBy", "asc")
 	userIDRaw, _ := ctx.Get("userId")
 	userID := userIDRaw.(int)
-
-	fmt.Println((userID))
 
 	filter := entity.LeaveRequestFilter{
 		UserId: strconv.Itoa(userID),
@@ -164,8 +161,6 @@ func (h *LeaveRequest) CreateLeaveRequest(ctx *gin.Context) {
 	loc, _ := time.LoadLocation("Asia/Jakarta")
 	now := time.Now().In(loc)
 	start := createLeaveRequestRequest.StartDate
-
-	fmt.Println(start)
 
 	nowDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, loc)
 	startDate := time.Date(start.Year(), start.Month(), start.Day(), 0, 0, 0, 0, loc)
