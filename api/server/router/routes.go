@@ -17,6 +17,7 @@ func RegisterPublicEndpoints(router *gin.Engine, userHandlers *handler.User, aut
 	{
 		protected.POST("/leave-requests", leaveRequestHandlers.CreateLeaveRequest)
 		protected.GET("/my-leave-requests", leaveRequestHandlers.GetMyLeaveRequests)
+		protected.PATCH("/leave-requests/:id/submit", leaveRequestHandlers.Submit)
 
 	}
 

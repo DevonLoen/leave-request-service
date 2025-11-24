@@ -16,14 +16,11 @@ import (
 
 type LeaveRequestUsecase interface {
 	CreateLeaveRequest(*dto.CreateLeaveRequestRequest, int) (*dto.CreateLeaveRequestResponse, *models.ErrorResponse)
-
 	GetAllLeaveRequests(limit, offset int, sortBy, orderBy, search string, filter entity.LeaveRequestFilter) (*dto.GetAllLeaveRequestsResponse, *models.ErrorResponse)
-
 	GetLeaveRequest(leaveRequestID int) (*dto.LeaveRequestResponse, *models.ErrorResponse)
-
 	Approve(leaveRequestID int) *models.ErrorResponse
-
 	Reject(leaveRequestID int) *models.ErrorResponse
+	Submit(leaveRequestID int) *models.ErrorResponse
 }
 
 type LeaveRequest struct {
@@ -148,6 +145,13 @@ func (us *LeaveRequest) Approve(leaveRequestID int) *models.ErrorResponse {
 		}
 	}
 
+	if existingLeaveRequest.Status == "draft" {
+		return &models.ErrorResponse{
+			Code:    http.StatusUnprocessableEntity,
+			Message: "Leave Request status is still draft",
+		}
+	}
+
 	if existingLeaveRequest.Status == "approved" {
 		return &models.ErrorResponse{
 			Code:    http.StatusConflict,
@@ -187,6 +191,13 @@ func (us *LeaveRequest) Reject(leaveRequestID int) *models.ErrorResponse {
 		}
 	}
 
+	if existingLeaveRequest.Status == "draft" {
+		return &models.ErrorResponse{
+			Code:    http.StatusUnprocessableEntity,
+			Message: "Leave Request status is still draft",
+		}
+	}
+
 	err = us.leaveRequestRepo.Reject(existingLeaveRequest.ID)
 
 	if err != nil {
@@ -214,5 +225,39 @@ func (lr *LeaveRequest) OverlapApprovedLeaveExists(userId int, startDate, endDat
 			Message: "The requested leave dates overlap with an already approved leave request.",
 		}
 	}
+	return nil
+}
+
+func (us *LeaveRequest) Submit(leaveRequestID int) *models.ErrorResponse {
+	existingLeaveRequest, err := us.leaveRequestRepo.FindById(leaveRequestID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return &models.ErrorResponse{
+				Code:    http.StatusNotFound,
+				Message: "Leave Request not found",
+			}
+		}
+		return &models.ErrorResponse{
+			Code:    http.StatusInternalServerError,
+			Message: "Internal Server Error",
+		}
+	}
+
+	if existingLeaveRequest.Status != "draft" {
+		return &models.ErrorResponse{
+			Code:    http.StatusUnprocessableEntity,
+			Message: "Only Draft leave Request can be submitted",
+		}
+	}
+
+	err = us.leaveRequestRepo.Submit(existingLeaveRequest.ID)
+
+	if err != nil {
+		return &models.ErrorResponse{
+			Code:    http.StatusInternalServerError,
+			Message: "Failed to Submit Leave Request",
+		}
+	}
+
 	return nil
 }

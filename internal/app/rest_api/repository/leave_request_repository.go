@@ -17,6 +17,7 @@ type LeaveRequestRepository interface {
 	Approve(leaveRequestId int) error
 	Reject(leaveRequestId int) error
 	OverlapApprovedLeaveExists(userId int, startDate, endDate time.Time) (bool, error)
+	Submit(leaveRequestId int) error
 }
 
 type LeaveRequest struct {
@@ -135,4 +136,12 @@ func (r *LeaveRequest) OverlapApprovedLeaveExists(userId int, startDate, endDate
 	}
 
 	return false, nil
+}
+
+func (r *LeaveRequest) Submit(leaveRequestId int) error {
+	_, err := r.ExecuteQuery(
+		"UPDATE leave_requests SET status = 'waiting_approval' WHERE id = $1",
+		leaveRequestId,
+	)
+	return err
 }
