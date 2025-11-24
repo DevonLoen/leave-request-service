@@ -224,7 +224,10 @@ func (h *LeaveRequest) Submit(ctx *gin.Context) {
 		return
 	}
 
-	submitError := h.leaveRequestUsecase.Submit(leaveRequestID)
+	userIDRaw, _ := ctx.Get("userId")
+	userID := userIDRaw.(int)
+
+	submitError := h.leaveRequestUsecase.Submit(leaveRequestID, userID)
 	if submitError != nil {
 		ctx.AbortWithStatusJSON(submitError.Code, submitError)
 		return

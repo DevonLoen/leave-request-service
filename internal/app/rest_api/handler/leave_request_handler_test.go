@@ -46,9 +46,9 @@ func (m *MockLeaveRequestUsecase) GetLeaveRequest(id int) (*dto.LeaveRequestResp
 	return nil, nil
 }
 
-func (m *MockLeaveRequestUsecase) Approve(id int) *models.ErrorResponse { return nil }
-func (m *MockLeaveRequestUsecase) Reject(id int) *models.ErrorResponse  { return nil }
-func (m *MockLeaveRequestUsecase) Submit(id int) *models.ErrorResponse  { return nil }
+func (m *MockLeaveRequestUsecase) Approve(id int) *models.ErrorResponse        { return nil }
+func (m *MockLeaveRequestUsecase) Reject(id int) *models.ErrorResponse         { return nil }
+func (m *MockLeaveRequestUsecase) Submit(id, userID int) *models.ErrorResponse { return nil }
 
 func TestCreateLeaveRequestHandler(t *testing.T) {
 	gin.SetMode(gin.TestMode)
