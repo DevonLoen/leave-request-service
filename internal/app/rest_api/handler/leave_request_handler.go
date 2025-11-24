@@ -215,3 +215,20 @@ func (h *LeaveRequest) Reject(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Leave Request Rejected"})
 }
+
+func (h *LeaveRequest) Submit(ctx *gin.Context) {
+	leaveRequestID, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Leave Request ID not valid"})
+
+		return
+	}
+
+	submitError := h.leaveRequestUsecase.Submit(leaveRequestID)
+	if submitError != nil {
+		ctx.AbortWithStatusJSON(submitError.Code, submitError)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Leave Request Submitted"})
+}

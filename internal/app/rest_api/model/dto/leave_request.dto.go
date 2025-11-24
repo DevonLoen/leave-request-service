@@ -7,6 +7,7 @@ import (
 )
 
 type LeaveRequestResponse struct {
+	ID        int       `json:"id"`
 	StartDate time.Time `json:"startDate"`
 	EndDate   time.Time `json:"endDate"`
 	Type      string    `json:"type"`
@@ -38,6 +39,7 @@ type CreateLeaveRequestResponse struct {
 func (r *GetAllLeaveRequestsResponse) MapLeaveRequestsResponse(leaveRequests []*entity.LeaveRequest) {
 	for _, leaveRequests := range leaveRequests {
 		leaveRequest := &LeaveRequestResponse{
+			ID:        leaveRequests.ID,
 			StartDate: leaveRequests.StartDate,
 			EndDate:   leaveRequests.EndDate,
 			Type:      string(leaveRequests.Type),
@@ -49,6 +51,7 @@ func (r *GetAllLeaveRequestsResponse) MapLeaveRequestsResponse(leaveRequests []*
 }
 
 func (r *LeaveRequestResponse) MapLeaveRequestResponse(leaveRequest *entity.LeaveRequest) {
+	r.ID = leaveRequest.ID
 	r.StartDate = leaveRequest.StartDate
 	r.EndDate = leaveRequest.EndDate
 	r.Type = string(leaveRequest.Type)
