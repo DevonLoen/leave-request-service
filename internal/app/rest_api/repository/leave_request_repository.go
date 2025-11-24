@@ -81,7 +81,6 @@ func (r *LeaveRequest) GetAllLeaveRequests(limit, offset int, sortBy, orderBy, s
 
 	baseQuery += fmt.Sprintf(" ORDER BY lr.%s %s LIMIT $%d OFFSET $%d", sortBy, orderBy, argId, argId+1)
 	args = append(args, limit, offset)
-	fmt.Println(("here2?"))
 
 	return r.SelectMultiple(
 		mapLeaveRequests,

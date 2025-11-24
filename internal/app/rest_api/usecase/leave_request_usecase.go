@@ -3,7 +3,6 @@ package usecase
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -73,7 +72,7 @@ func (us *LeaveRequest) GetAllLeaveRequests(limit, offset int, sortBy, orderBy, 
 			}
 		}
 	}
-	fmt.Println(("here?"))
+
 	queriedLeaveRequests, err := us.leaveRequestRepo.GetAllLeaveRequests(limit, offset, safeSortBy, safeOrderBy, search, filter)
 	if err != nil {
 		return nil, &models.ErrorResponse{
