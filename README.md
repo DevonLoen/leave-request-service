@@ -35,16 +35,28 @@ Please ensure you have the following installed in your development environment:
       * **For Running without Docker Compose (Host Database):**
         ```ini
         # .env
-        DATABASE_URL="postgres://user:password@localhost:5432/leavedb?sslmode=disable"
-        SERVER_PORT=8080
+        ENV=development
+        SERVER_ADDRESS=0.0.0.0:8080
+        CORS_ALLOWED_ORIGIN=*
+        DB_DRIVER=postgres
+        DB_SOURCE=postgres://user:password@localhost:5432/leavedb?sslmode=disable //adjust
+        SUPER_ADMIN_EMAIL=admin@example.com
+        SUPER_ADMIN_PASSWORD=123456
+        JWT_SECRET=saltandpepper
         ```
       * **For Running with Docker Compose (Recommended):**
         ```ini
         # .env
-        DATABASE_URL="postgres://user:password@db:5432/leavedb?sslmode=disable"
-        SERVER_PORT=8080
+        ENV=development
+        SERVER_ADDRESS=0.0.0.0:8080
+        CORS_ALLOWED_ORIGIN=*
+        DB_DRIVER=postgres
+        DB_SOURCE=postgres://postgres:postgres@localhost:5432/leave_request?sslmode=disable
+        SUPER_ADMIN_EMAIL=admin@example.com
+        SUPER_ADMIN_PASSWORD=123456
+        JWT_SECRET=saltandpepper
         ```
-        > **Note:** **`db`** is the service name (hostname) for the PostgreSQL container as defined in `docker-compose.yml`.
+        > **Note:** **`postgres`** is the service name (hostname) for the PostgreSQL container as defined in `docker-compose.yml`.
 
 -----
 
@@ -130,7 +142,7 @@ Docker Compose allows you to launch the database service (PostgreSQL) and your G
 
 ### a. Start the Services (Database & API)
 
-This command reads the `docker-compose.yml` file, builds the Go application image (if needed), and starts all defined services (e.g., `db` and `api`) in the background.
+This command reads the `docker-compose.yml` file, builds the Go application image (if needed), and starts all defined services (e.g., `app` and `postgres`) in the background.
 
 ```bash
 docker compose up -d
@@ -148,17 +160,17 @@ docker compose down
 
 ### c. Running Migrations/Seeding against the Dockerized DB
 
-If you want to run the `make migrate` or `make seed` commands against the database running inside the Docker container, you must ensure your local `.env` file is configured to point to the host's port (e.g., `localhost:5432`) if you run the commands from **outside** the container.
+If you want to run the `make migrate` or `make seed` commands against the database running inside the Docker container, you must ensure your local `dev.env` file is configured to point to the host's port (e.g., `localhost:5432`) if you run the commands from **outside** the container.
 
 1.  **Stop Docker Compose:** `docker compose down` (If your services are currently running in the background).
-2.  **Edit `.env`:** Change `DATABASE_URL` to point to `localhost`.
+2.  **Edit `dev.env`:** Change `DB_SOURCE` to point to `localhost`.
     ```ini
     # .env
-    DATABASE_URL="postgres://user:password@localhost:5432/leavedb?sslmode=disable"
+    DATABASE_URL="postgres://postgres:postgres@localhost:5432/leave_request?sslmode=disable"
     ```
 3.  **Start ONLY the Database:**
     ```bash
-    docker compose up -d db
+    docker compose up -d postgres
     ```
 4.  **Run Migration/Seed (from your host machine):**
     ```bash

@@ -50,6 +50,10 @@ func (m *MockLeaveRequestRepo) Reject(leaveRequestID int) error {
 	return m.Called(leaveRequestID).Error(0)
 }
 
+func (m *MockLeaveRequestRepo) Submit(leaveRequestID int) error {
+	return m.Called(leaveRequestID).Error(0)
+}
+
 func TestCreateLeaveRequest(t *testing.T) {
 
 	mockRepo := new(MockLeaveRequestRepo)
