@@ -3,7 +3,6 @@ package usecase
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -20,7 +19,7 @@ type LeaveRequestUsecase interface {
 	GetLeaveRequest(leaveRequestID int) (*dto.LeaveRequestResponse, *models.ErrorResponse)
 	Approve(leaveRequestID int) *models.ErrorResponse
 	Reject(leaveRequestID int) *models.ErrorResponse
-	Submit(leaveRequestID int) *models.ErrorResponse
+	Submit(leaveRequestID, userID int) *models.ErrorResponse
 }
 
 type LeaveRequest struct {
@@ -73,7 +72,7 @@ func (us *LeaveRequest) GetAllLeaveRequests(limit, offset int, sortBy, orderBy, 
 			}
 		}
 	}
-	fmt.Println(("here?"))
+
 	queriedLeaveRequests, err := us.leaveRequestRepo.GetAllLeaveRequests(limit, offset, safeSortBy, safeOrderBy, search, filter)
 	if err != nil {
 		return nil, &models.ErrorResponse{
@@ -228,7 +227,7 @@ func (lr *LeaveRequest) OverlapApprovedLeaveExists(userId int, startDate, endDat
 	return nil
 }
 
-func (us *LeaveRequest) Submit(leaveRequestID int) *models.ErrorResponse {
+func (us *LeaveRequest) Submit(leaveRequestID, userId int) *models.ErrorResponse {
 	existingLeaveRequest, err := us.leaveRequestRepo.FindById(leaveRequestID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -240,6 +239,13 @@ func (us *LeaveRequest) Submit(leaveRequestID int) *models.ErrorResponse {
 		return &models.ErrorResponse{
 			Code:    http.StatusInternalServerError,
 			Message: "Internal Server Error",
+		}
+	}
+
+	if existingLeaveRequest.UserId != userId {
+		return &models.ErrorResponse{
+			Code:    http.StatusForbidden,
+			Message: "The specified leave request belongs to another user.",
 		}
 	}
 
